@@ -24,50 +24,44 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var MyLayer = cc.Layer.extend({
-
+var MyLayer = cc.LayerColor.extend({
+    plane:null,
     init:function () {
 
         //////////////////////////////
         // 1. super init first
         this._super();
 
-        /////////////////////////////
-        // 2. add a menu item with "X" image, which is clicked to quit the program
-        //    you may modify it.
-        // ask director the window size
-        var size = cc.Director.getInstance().getWinSize();
+        this.setColor(cc.c4(225,225,225,225));
 
-        // add a "close" icon to exit the progress. it's an autorelease object
-        var closeItem = cc.MenuItemImage.create(
-            s_CloseNormal,
-            s_CloseSelected,
-            function () {
-                cc.log("close");
-            },this);
-        closeItem.setAnchorPoint(0.5, 0.5);
+        var winSize = cc.Director.getInstance().getWinSize();
+        var origin = cc.Director.getInstance().getVisibleOrigin();
 
-        var menu = cc.Menu.create(closeItem);
-        menu.setPosition(0, 0);
-        this.addChild(menu, 1);
-        closeItem.setPosition(size.width - 20, 20);
+        this.plane = cc.Sprite.create(s_Plane,cc.rect(0,0,60,60));
+        //设置图片中心点的位置
+        this.plane.setPosition(cc.p(origin.x + winSize.width/2, origin.y +this.plane.getContentSize().height/2));
 
-        /////////////////////////////
-        // 3. add your codes below...
-        // add a label shows "Hello World"
-        // create and initialize a label
-        this.helloLabel = cc.LabelTTF.create("Hello World", "Impact", 38);
-        // position the label on the center of the screen
-        this.helloLabel.setPosition(size.width / 2, size.height - 40);
-        // add the label as a child to this layer
-        this.addChild(this.helloLabel, 5);
-
-        // add "Helloworld" splash screen"
-        this.sprite = cc.Sprite.create(s_HelloWorld);
-        this.sprite.setAnchorPoint(0.5, 0.5);
-        this.sprite.setPosition(size.width / 2, size.height / 2);
-        this.sprite.setScale(size.height/this.sprite.getContentSize().height);
-        this.addChild(this.sprite, 0);
+        this.setTouchEnabled(true);
+        this.addChild(this.plane,1);
+        return true;
+    },
+    onTouchesMoved: function(touches,event){
+        var touch = touches[0];
+        var location = touch.getLocation();
+        if(this.onClickFlag){
+            this.plane.setPosition(location);
+        }
+    },
+    onTouchesEnded: function(touches,event){
+        this.onclickFrag = false;
+    },
+    onTouchesBegan: function(touches,event){
+        var touch = touches[0];
+        var location = touch.getLocation();
+        //判断图片是否超出边界
+        if(cc.rectContainsPoint(this.plane.getBoundingBox(),location)){
+            this.onClickFlag = true;
+        }
     }
 });
 
